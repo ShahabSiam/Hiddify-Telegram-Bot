@@ -998,8 +998,7 @@ def callback_query(call: CallbackQuery):
         if servers:
             for server in servers:
                 user = api.find(server['url'] + API_PATH, value)
-        logging.error(user)
-        sub = utils.sub_links(value)
+        sub = utils.sub_links(value,name=user['name'])
 
 
         if not sub:
