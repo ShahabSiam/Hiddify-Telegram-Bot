@@ -994,7 +994,16 @@ def callback_query(call: CallbackQuery):
         )
 
     elif key == "conf_sub_auto":
+        servers = USERS_DB.select_servers()
         sub = utils.sub_links(value)
+        if servers:
+            for server in servers:
+                user = api.find(server['url'] + API_PATH, value)
+                if user:
+                    selected_server_id = server['id']
+                    URL = server['url'] + API_PATH
+                    break
+
         if not sub:
             bot.send_message(call.message.chat.id, MESSAGES['UNKNOWN_ERROR'])
             return

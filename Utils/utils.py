@@ -201,6 +201,7 @@ def sub_links(uuid, url= None):
         #                 url = server['url']
         #                 break
     BASE_URL = urlparse(url).scheme + "://" + urlparse(url).netloc
+    MYURL="https://op.goje.shop/config"
     logging.info(f"Get sub links of user - {uuid}")
     sub = {}
     PANEL_DIR = urlparse(url).path.split('/')
@@ -211,7 +212,9 @@ def sub_links(uuid, url= None):
     sub['sub_link'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/all.txt"
     sub['sub_link_b64'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/all.txt?base64=True"
     # Add in v8.0 Hiddify
-    sub['sub_link_auto'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/sub/?asn=unknown"
+    uuid = uuid[:8]
+    # sub['sub_link_auto'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/sub/?asn=unknown"
+    sub['sub_link_auto'] = f"{MYURL}/?user={PANEL_DIR[1]}/{uuid}/sub/?asn=unknown"
     sub['sing_box_full'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/full-singbox.json?asn=unknown"
     sub['sing_box'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/singbox.json?asn=unknown"
     return sub
@@ -252,7 +255,7 @@ def sub_parse(sub):
                     if trojan_sni.group(1) == "fake_ip_for_sub_link":
                         continue
                 config_links['trojan'].append([url[2], match.group(1)])
-        
+
     return config_links
 
 
@@ -553,7 +556,7 @@ def find_order_subscription_by_uuid(uuid):
         return non_order_subscription[0]
     else:
         return False
-    
+
 def is_it_subscription_by_uuid_and_telegram_id(uuid, telegram_id):
     subs = []
     flag = False
@@ -568,8 +571,8 @@ def is_it_subscription_by_uuid_and_telegram_id(uuid, telegram_id):
                         subs.append(subscription)
                         break
             if flag == True:
-                break 
-    
+                break
+
     non_order_subscriptions = USERS_DB.find_non_order_subscription(telegram_id=telegram_id)
     if non_order_subscriptions:
         for subscription in non_order_subscriptions:
@@ -661,8 +664,8 @@ def restore_json_bot(file):
     except Exception as e:
         logging.exception(f"Exception: {e}")
         return False
-                
-            
+
+
     bk_json_file = os.path.join(extract_path, os.path.basename(json_filename))
     # with open(bk_json_file, 'r') as f:
     #     bk_json_data = json.load(f)
@@ -693,23 +696,23 @@ def restore_json_bot(file):
         return False
     return True
 
-# Debug Data 
+# Debug Data
 def debug_data():
     bk_json_data = USERS_DB.backup_to_json(BOT_BACKUP_LOC)
     if not bk_json_data:
         return False
-    
+
     bk_json_data['version'] = __version__
-    
+
     new_servers = []
     for server in bk_json_data['servers']:
         url = privacy_friendly_logging_request(server['url'])
         server['url'] = url
         new_servers.append(server)
     bk_json_data['servers'] = new_servers
-    
+
     bk_json_data['str_config'] = [x for x in bk_json_data['str_config'] if x['key'] not in ['bot_token_admin','bot_token_client']]
-    
+
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
     bk_json_file = os.path.join(BOT_BACKUP_LOC, f"DB_Data_{dt_string}.json")
@@ -732,4 +735,3 @@ def debug_data():
 
     os.remove(bk_json_file)
     return zip_file
-    
