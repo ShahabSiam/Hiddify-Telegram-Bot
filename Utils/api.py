@@ -28,7 +28,8 @@ def find(url, uuid, endpoint="/user/"):
 
         response = requests.get(url + endpoint, data={"uuid": uuid})
         jr = response.json()
-        logging.error(jr)
+        if endpoint == "/user/":
+            logging.error(f"{jr}\n{url}")
         if len(jr) != 1:
             # Search for uuid
             for user in jr:
