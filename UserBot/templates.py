@@ -9,7 +9,7 @@ def user_info_template(sub_id, server, usr, header=""):
     if settings:
         settings = settings[0]
         if settings['value']:
-            user_name = f"{usr['name']} </a>"
+            user_name = f"{usr['name']}"
         else:
             user_name = usr['name']
     else:
