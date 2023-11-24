@@ -214,7 +214,7 @@ def sub_links(uuid, name="", url= None):
     # Add in v8.0 Hiddify
     uuid = uuid[:8]
     # sub['sub_link_auto'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/sub/?asn=unknown"
-    sub['sub_link_auto'] = f"{MYURL}/?user={uuid}&id={name}"
+    sub['sub_link_auto'] = f"{MYURL}/?user={name}&id={uuid}"
     sub['sing_box_full'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/full-singbox.json?asn=unknown"
     sub['sing_box'] = f"{BASE_URL}/{PANEL_DIR[1]}/{uuid}/singbox.json?asn=unknown"
     return sub
