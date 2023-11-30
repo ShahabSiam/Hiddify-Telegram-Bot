@@ -70,6 +70,7 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
                 conectionuser.commit()
                 time.sleep(0.05)
             except Exception as e:
+                logging.error(e)
                 conectionuser.execute("UPDATE users set msgsend=1 where id=?", (x[0],))
                 conectionuser.commit()
         return True
