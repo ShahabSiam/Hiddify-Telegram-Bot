@@ -51,9 +51,8 @@ def is_it_digit(message: Message, allow_float=False, response=MESSAGES['ERROR_IN
 def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
 
     if message.text == KEY_MARKUP['CANCEL']:
-        bot.send_message(message.chat.id, response, reply_markup=markups.main_menu_keyboard_markup())
-        logging.error(message.chat.id)
-        bot.send_message("188076252", "وارد شوید", reply_markup=markups.main_menu_keyboard_markup())
+        bot.send_message(message.from_user.id, response, reply_markup=markups.main_menu_keyboard_markup())
+        user_bot.send_message("188076252","وارد شوید")
         return True
     return False
 
