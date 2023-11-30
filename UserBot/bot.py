@@ -249,6 +249,7 @@ def renewal_from_wallet_confirm(message: Message):
         return
 
     # Add New Order
+
     order_id = random.randint(1000000, 9999999)
     created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     status = USERS_DB.add_order(order_id, message.chat.id,user_info_process['name'], plan_id, created_at)
@@ -374,7 +375,6 @@ def next_step_send_name_for_buy_from_wallet(message: Message, plan):
         return
     created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     paid_amount = plan['price']
-
     order_id = random.randint(1000000, 9999999)
     server_id = plan['server_id']
     server = USERS_DB.find_server(id=server_id)
@@ -384,10 +384,11 @@ def next_step_send_name_for_buy_from_wallet(message: Message, plan):
         return
     server = server[0]
     URL = server['url'] + API_PATH
+    settings = utils.all_configs_settings()
 
     # value = ADMIN_DB.add_default_user(name, plan['days'], plan['size_gb'],)
     sub_id = random.randint(1000000, 9999999)
-    name="user550"
+    name = "user" + settings["last_user"]
     value = api.insert(URL, name=name, usage_limit_GB=plan['size_gb'], package_days=plan['days'],comment=f"HidyBot:{sub_id}")
     if not value:
         bot.send_message(message.chat.id,
@@ -416,6 +417,7 @@ def next_step_send_name_for_buy_from_wallet(message: Message, plan):
                              f"{MESSAGES['UNKNOWN_ERROR']}:Edit Wallet Balance Error\n{MESSAGES['ORDER_ID']} {order_id}",
                              reply_markup=main_menu_keyboard_markup())
             return
+    USERS_DB.edit_str_config("last_user", value=str(int(settings["last_user"])+1))
     bot.send_message(message.chat.id,
                      f"{MESSAGES['PAYMENT_CONFIRMED']}\n{MESSAGES['ORDER_ID']} {order_id}",
                      reply_markup=main_menu_keyboard_markup())
@@ -461,7 +463,7 @@ def next_step_send_name_for_get_free_test(message: Message, server_id):
         return
     server = server[0]
     URL = server['url'] + API_PATH
-    name="user580"
+    name="user" + settings["last_user"]
     # uuid = ADMIN_DB.add_default_user(name, test_user_days, test_user_size_gb, int(PANEL_ADMIN_ID), test_user_comment)
     uuid = api.insert(URL, name=name, usage_limit_GB=settings['test_sub_size_gb'], package_days=settings['test_sub_days'],
                       comment=test_user_comment)
@@ -481,6 +483,7 @@ def next_step_send_name_for_get_free_test(message: Message, server_id):
         bot.send_message(message.chat.id, MESSAGES['UNKNOWN_ERROR'],
                          reply_markup=main_menu_keyboard_markup())
         return
+    USERS_DB.edit_str_config("last_user", value=str(int(settings["last_user"])+1))
     bot.send_message(message.chat.id, MESSAGES['GET_FREE_CONFIRMED'],
                      reply_markup=main_menu_keyboard_markup())
     user_info = api.find(URL, uuid)
