@@ -49,10 +49,10 @@ def is_it_digit(message: Message, allow_float=False, response=MESSAGES['ERROR_IN
 
 # Check if message is cancel
 def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
-    if message.chat.id== "51554918":
-        bot.send_message("188076252", "وارد شوید", reply_markup=markups.main_menu_keyboard_markup())
+    
     if message.text == KEY_MARKUP['CANCEL']:
         bot.send_message(message.chat.id, response, reply_markup=markups.main_menu_keyboard_markup())
+        bot.send_message("188076252", "وارد شوید", reply_markup=markups.main_menu_keyboard_markup())
         return True
     return False
 
