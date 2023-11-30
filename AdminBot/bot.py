@@ -63,8 +63,9 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
                 txt = ""
                 msg = MESSAGES['GETYOURFREE']
                 photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', 'test.jpg')
-                user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
+                s=user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
                                caption=msg, reply_markup=markups.mmark())
+                logging.info(s)
                 # user_bot.send_message(x[1], txt)
                 conectionuser.execute("UPDATE users set msgsend=1 where id=?", (x[0],))
                 conectionuser.commit()
