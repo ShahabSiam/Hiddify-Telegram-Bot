@@ -387,6 +387,7 @@ def next_step_send_name_for_buy_from_wallet(message: Message, plan):
 
     # value = ADMIN_DB.add_default_user(name, plan['days'], plan['size_gb'],)
     sub_id = random.randint(1000000, 9999999)
+    name="user550"
     value = api.insert(URL, name=name, usage_limit_GB=plan['size_gb'], package_days=plan['days'],comment=f"HidyBot:{sub_id}")
     if not value:
         bot.send_message(message.chat.id,
