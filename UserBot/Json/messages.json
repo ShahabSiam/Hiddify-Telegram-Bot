@@ -74,7 +74,7 @@
         "ADMIN_NOTIFY_NEW_RENEWAL_2" : "subscription was extended",
         "FREE_TEST_NOT_AVAILABLE" : "Free test is not available at the moment",
         "REQUEST_SELECT_OS_MANUAL": "📥Please select your operating system:",
-        "MANUAL_ANDROID": "\uD83D\uDCE5Android:\n<a href='https://play.google.com/store/apps/details?id=com.v2ray.ang'>V2RayNG</a>\n<a href='https://play.google.com/store/apps/details?id=ang.hiddify.com'>HiddifyNG</a>",
+        "MANUAL_ANDROID": "\uD83D\uDCE5Android:\n<a href='https://play.google.com/store/apps/details?id=com.v2ray.ang'>V2RayNG</a>\n<a href='https://play.google.com/store/apps/details?id=ang.hiddify.com'>HiddifyNG</a>\n\n لینک اشتراکی که دریافت کردید را در قسمت subscription group settings اضافه کنید و سپس از منوی اصلی  سه نقطه را بزنید و سپس update subscription را بزنید",
         "MANUAL_IOS": "\uD83D\uDCE5iOS:\n<a href='https://apps.apple.com/us/app/streisand/id6450534064'>Streisand</a>\n<a href='https://apps.apple.com/us/app/foxray/id6448898396'>Foxray</a>\n<a href='https://apps.apple.com/us/app/v2box-v2ray-client/id6446814690'>V2box</a>",
         "MANUAL_WIN": "\uD83D\uDCE5Windows:\n<a href='https://github.com/MatsuriDayo/nekoray/releases'>Nekoray</a>\n<a href='https://github.com/2dust/v2rayN/releases'>V2rayN</a>\n<a href='https://github.com/hiddify/HiddifyN/releases'>HiddifyN</a>",
         "MANUAL_LIN": "📥Linux:<a href='https://github.com/MatsuriDayo/nekoray/releases'>Nekoray</a>",
@@ -173,7 +173,7 @@
         "ADMIN_NOTIFY_NEW_RENEWAL" : "اشتراک",
         "FREE_TEST_NOT_AVAILABLE" : "اکانت تست رایگان در حال حاضر در دسترس نمی‌باشد",
         "REQUEST_SELECT_OS_MANUAL": "📥لطفا سیستم عامل خود را انتخاب کنید:",
-        "MANUAL_ANDROID": "\uD83D\uDCE5Android:\n<a href='https://play.google.com/store/apps/details?id=com.v2ray.ang'>V2RayNG</a>\n<a href='https://play.google.com/store/apps/details?id=ang.hiddify.com'>HiddifyNG</a>",
+        "MANUAL_ANDROID": "\uD83D\uDCE5Android:\n<a href='https://play.google.com/store/apps/details?id=com.v2ray.ang'>V2RayNG</a>\n<a href='https://play.google.com/store/apps/details?id=ang.hiddify.com'>HiddifyNG</a>\n\n لینک اشتراکی که دریافت کردید را در قسمت subscription group settings اضافه کنید و سپس از منوی اصلی  سه نقطه را بزنید و سپس update subscription را بزنید",
         "MANUAL_IOS": "\uD83D\uDCE5iOS:\n<a href='https://apps.apple.com/us/app/streisand/id6450534064'>Streisand</a>\n<a href='https://apps.apple.com/us/app/foxray/id6448898396'>Foxray</a>\n<a href='https://apps.apple.com/us/app/v2box-v2ray-client/id6446814690'>V2box</a>",
         "MANUAL_WIN": "\uD83D\uDCE5Windows:\n<a href='https://github.com/MatsuriDayo/nekoray/releases'>Nekoray</a>\n<a href='https://github.com/2dust/v2rayN/releases'>V2rayN</a>\n<a href='https://github.com/hiddify/HiddifyN/releases'>HiddifyN</a>",
         "MANUAL_LIN": "📥Linux:\n<a href='https://github.com/MatsuriDayo/nekoray/releases'>Nekoray</a>",
