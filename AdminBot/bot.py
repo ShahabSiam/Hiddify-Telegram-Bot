@@ -61,7 +61,10 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
         for x in row:
             try:
                 txt = ""
+                usage=int(x[2])
                 msg = MESSAGES['GETYOURFREE']
+                if usage<0:
+                    msg+="\n"+"کانکشن مخصوص شما با توجه به دعوت از دیگران که قبلا انجام دادید " + str(round(abs(usage)/1024)+2)+ "گیگ و "+ str(min(2+round(abs(usage)/1024/4),45))+"روز می باشد"
                 photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', 'test.jpg')
                 # s=user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
                 #                caption=msg, reply_markup=markups.mmark())
