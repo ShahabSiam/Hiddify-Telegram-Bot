@@ -53,8 +53,7 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
 
     if message.text == KEY_MARKUP['CANCEL']:
         bot.send_message(message.from_user.id, response, reply_markup=markups.main_menu_keyboard_markup())
-<<<<<<< HEAD
-=======
+
 
         conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
         cursor = conectionuser.cursor()
@@ -81,7 +80,7 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
                 logging.error(e)
                 conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
                 conectionuser.commit()
->>>>>>> parent of b164404 (Update bot.py)
+
         return True
     return False
 
