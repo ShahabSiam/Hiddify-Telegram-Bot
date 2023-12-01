@@ -15,7 +15,7 @@ def main_menu_keyboard_markup():
     markup.add(KeyboardButton(KEY_MARKUP['USERS_SEARCH']))
     if CLIENT_TOKEN:
         markup.add(KeyboardButton(KEY_MARKUP['USERS_BOT_MANAGEMENT']))
-        markup.add(KeyboardButton(KEY_MARKUP['SEND_TO_USERS']))
+        markup.add(KeyboardButton(KEY_MARKUP['SEND_TO_USERS'])) 
     markup.add()
     markup.add(KeyboardButton(KEY_MARKUP['SERVER_STATUS']), KeyboardButton(KEY_MARKUP['ABOUT_BOT']),
                KeyboardButton(KEY_MARKUP['SERVER_BACKUP']))
