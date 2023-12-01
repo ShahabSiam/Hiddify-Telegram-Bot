@@ -119,8 +119,7 @@
     "DEBUG":"DEBUG",
     "SKIP":"⏩Skip",
     "RESET_TEST":"🔄Reset Test",
-    "BAN_USER":"🚫Ban User",
-    "SEND_TO_USERS": "Send To All"
+    "BAN_USER":"🚫Ban User"
   },
   "FA": {
     "CONFIRM": "✅تأیید",
@@ -242,7 +241,7 @@
     "DEBUG":"DEBUG",
     "SKIP":"⏩رد کردن",
     "RESET_TEST":"🔄بازنشانی اشتراک تستی",
-    "BAN_USER":"🚫مسدود کردن کاربر",
-    "SEND_TO_USERS": "ارسال به همه"
+    "BAN_USER":"🚫مسدود کردن کاربر"
+
   }
 }

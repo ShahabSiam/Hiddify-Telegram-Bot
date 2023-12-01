@@ -213,8 +213,7 @@
     "WALLET_BALANCE_CHANGED_BY_ADMIN_P1": "💰Wallet balance changed to",
     "WALLET_BALANCE_CHANGED_BY_ADMIN_P2": "by admin",
     "SUCCESS_BAN_USER": "✅User banned",
-    "SUCCESS_UNBAN_USER": "✅User unbanned",
-    "SEND_TO_USERS": "Send To ALL"
+    "SUCCESS_UNBAN_USER": "✅User unbanned"
   },
   "FA": {
     "WELCOME": "به ربات مدیریت هیدی بات خوش آمدید.",
