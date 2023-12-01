@@ -1,5 +1,6 @@
 import datetime
 import random
+import sqlite3
 
 import telebot
 from telebot.types import Message, CallbackQuery
@@ -458,14 +459,26 @@ def next_step_send_name_for_get_free_test(message: Message, server_id):
     test_user_comment = "HidyBot:FreeTest"
     server = USERS_DB.find_server(id=server_id)
     if not server:
+
         bot.send_message(message.chat.id, MESSAGES['UNKNOWN_ERROR'],
                          reply_markup=main_menu_keyboard_markup())
         return
     server = server[0]
     URL = server['url'] + API_PATH
     name="user" + settings["last_user"]
+    conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
+    cursor = conectionuser.cursor()
+    cursor.execute("SELECT id,tgid,traffic from users where tgid=? ", (message.from_user.id,))
+    row = cursor.fetchone()
+    if row is None:
+        usage_GB=settings['test_sub_size_gb']
+        pakage_day=settings['test_sub_days']
+    else:
+        usage = int(row[2])
+        usage_GB=str(round(abs(usage)/1024)+2)
+        pakage_day=str(min(2+round(abs(usage)/1024/4),30))
     # uuid = ADMIN_DB.add_default_user(name, test_user_days, test_user_size_gb, int(PANEL_ADMIN_ID), test_user_comment)
-    uuid = api.insert(URL, name=name, usage_limit_GB=settings['test_sub_size_gb'], package_days=settings['test_sub_days'],
+    uuid = api.insert(URL, name=name, usage_limit_GB=usage_GB, package_days=pakage_day,
                       comment=test_user_comment)
     if not uuid:
         bot.send_message(message.chat.id, MESSAGES['UNKNOWN_ERROR'],
