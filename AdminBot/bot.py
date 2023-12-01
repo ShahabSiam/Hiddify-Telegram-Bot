@@ -53,6 +53,35 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
 
     if message.text == KEY_MARKUP['CANCEL']:
         bot.send_message(message.from_user.id, response, reply_markup=markups.main_menu_keyboard_markup())
+<<<<<<< HEAD
+=======
+
+        conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
+        cursor = conectionuser.cursor()
+        cursor.execute("SELECT id,tgid,traffic from users where msgsend<>2 LIMIT 150 ")
+        row = cursor.fetchall()
+        for x in row:
+            try:
+                txt = ""
+                usage=int(x[2])
+                msg = MESSAGES['GETYOURFREE']
+                if usage<0:
+                    msg+="\n"+"کانکشن مخصوص شما با توجه به دعوت از دیگران که قبلا انجام دادید " + str(round(abs(usage)/1024)+2)+ " گیگ و "+ str(min(2+round(abs(usage)/1024/4),30))+" روز می باشد"+"\n"
+                photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', 'test.jpg')
+                # s=user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
+                #                caption=msg, reply_markup=markups.mmark())
+                s = user_bot.send_photo(x[1], "AgACAgQAAxkDAAEEOThlaLMLqv6Nc7myS0i4vTq5fAcHmgACK78xGwh2SVMpi6kfPJNL5AEAAwIAA3MAAzME",
+                                        caption=msg, reply_markup=markups.mmark())
+                logging.info(s)
+                # user_bot.send_message(x[1], txt)
+                conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
+                conectionuser.commit()
+                time.sleep(0.1)
+            except Exception as e:
+                logging.error(e)
+                conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
+                conectionuser.commit()
+>>>>>>> parent of b164404 (Update bot.py)
         return True
     return False
 
