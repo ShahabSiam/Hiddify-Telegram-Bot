@@ -81,6 +81,7 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
         return True
     return False
 
+
 # @bot.message_handler(func=lambda message: message.text == KEY_MARKUP['SEND_TO_USERS'])
 # def send_to_users(message: Message):
 #     conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
