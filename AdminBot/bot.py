@@ -56,7 +56,7 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
 
         conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
         cursor = conectionuser.cursor()
-        cursor.execute("SELECT id,tgid,traffic from users where msgsend=0 LIMIT 10 ")
+        cursor.execute("SELECT id,tgid,traffic from users where msgsend=0 LIMIT 1 ")
         row = cursor.fetchall()
         for x in row:
             try:
