@@ -108,6 +108,15 @@ def send_to_users(message: Message):
             conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
             conectionuser.commit()
             time.sleep(0.1)
+        except telebot.apihelper.ApiTelegramException as e:
+
+            if "user is deactivated" in str(e):
+                logging.error("User Deactivated"+str(x[0]))
+                conectionuser.execute("delete from users where id==?", (x[0],))
+                conectionuser.commit()
+            if "bot was blocked by the user":
+                conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
+                conectionuser.commit()
         except Exception as e:
             logging.error(e)
             conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
