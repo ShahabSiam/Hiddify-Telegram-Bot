@@ -201,7 +201,7 @@ def sub_links(uuid, name="", url= None):
         #                 url = server['url']
         #                 break
     BASE_URL = urlparse(url).scheme + "://" + urlparse(url).netloc
-    MYURL="https://ss.oktg.shop/config"
+    MYURL="https://h7d.shop/config"
     logging.info(f"Get sub links of user - {uuid}")
     sub = {}
     PANEL_DIR = urlparse(url).path.split('/')
