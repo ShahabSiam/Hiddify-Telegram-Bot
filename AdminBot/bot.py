@@ -88,7 +88,7 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
 def send_to_users(message: Message):
     conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
     cursor = conectionuser.cursor()
-    cursor.execute("SELECT id,tgid,traffic from users where msgsend<>2 LIMIT 1 ")
+    cursor.execute("SELECT id,tgid,traffic from users where msgsend<>2 LIMIT 100 ")
     row = cursor.fetchall()
     for x in row:
         try:
@@ -100,12 +100,11 @@ def send_to_users(message: Message):
             #         round(abs(usage) / 1024) + 2) + " گیگ و " + str(
             #         min(2 + round(abs(usage) / 1024 / 4), 30)) + " روز می باشد" + "\n"
 
-            photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', 'test.jpg')
+            # photo_path = os.path.join(os.getcwd(), 'test.png')
             # s=user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
             #                caption=msg, reply_markup=markups.mmark())
-            photo_path = os.path.join(os.getcwd(), 'test.png')
 
-            s = user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
+            s = user_bot.send_photo(x[1], photo="AgACAgQAAxkDAAEEnqFmXzzTcVkorUIhcv9euSv61W86TwAC98AxG-Ay-FIiPqIzpUJ_IQEAAwIAA3MAAzUE",
                                caption=msg)
 
             # s = user_bot.send_photo(x[1],
