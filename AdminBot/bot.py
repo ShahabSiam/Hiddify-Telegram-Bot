@@ -29,11 +29,13 @@ search_mode = "Single"
 server_mode = "Single"
 searched_name = ""
 list_mode = ""
-item_mode= ""
+item_mode = ""
 selected_telegram_id = "0"
 
 if CLIENT_TOKEN:
     user_bot = user_bot()
+
+
 # ----------------------------------- Helper Functions -----------------------------------
 # Check if message is digit
 def is_it_digit(message: Message, allow_float=False, response=MESSAGES['ERROR_INVALID_NUMBER'],
@@ -48,9 +50,9 @@ def is_it_digit(message: Message, allow_float=False, response=MESSAGES['ERROR_IN
         bot.send_message(message.chat.id, response, reply_markup=markup)
         return False
 
+
 # Check if message is cancel
 def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
-
     if message.text == KEY_MARKUP['CANCEL']:
         bot.send_message(message.from_user.id, response, reply_markup=markups.main_menu_keyboard_markup())
         # conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
@@ -86,32 +88,40 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
 def send_to_users(message: Message):
     conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
     cursor = conectionuser.cursor()
-    cursor.execute("SELECT id,tgid,traffic from users where msgsend<>2 LIMIT 150 ")
+    cursor.execute("SELECT id,tgid,traffic from users where msgsend<>2 LIMIT 1 ")
     row = cursor.fetchall()
     for x in row:
         try:
             txt = ""
-            usage = int(x[2])
-            msg = MESSAGES['GETYOURFREE']
-            if usage < 0:
-                msg += "\n" + "کانکشن مخصوص شما با توجه به دعوت از دیگران که قبلا انجام دادید " + str(
-                    round(abs(usage) / 1024) + 2) + " گیگ و " + str(
-                    min(2 + round(abs(usage) / 1024 / 4), 30)) + " روز می باشد" + "\n"
+            # usage = int(x[2])
+            msg = MESSAGES['SEND_HAMESTER']
+            # if usage < 0:
+            #     msg += "\n" + "کانکشن مخصوص شما با توجه به دعوت از دیگران که قبلا انجام دادید " + str(
+            #         round(abs(usage) / 1024) + 2) + " گیگ و " + str(
+            #         min(2 + round(abs(usage) / 1024 / 4), 30)) + " روز می باشد" + "\n"
+
             photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', 'test.jpg')
             # s=user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
             #                caption=msg, reply_markup=markups.mmark())
-            s = user_bot.send_photo(x[1],
-                                    "AgACAgQAAxkDAAEEOThlaLMLqv6Nc7myS0i4vTq5fAcHmgACK78xGwh2SVMpi6kfPJNL5AEAAwIAA3MAAzME",
-                                    caption=msg, reply_markup=markups.mmark())
-            logging.info(s)
+            photo_path = os.path.join(os.getcwd(), 'test.png')
+
+            s = bot.send_photo(x[1], photo=open(photo_path, 'rb'),
+                               caption=msg)
+
+            # s = user_bot.send_photo(x[1],
+            #                         "AgACAgQAAxkDAAEEOThlaLMLqv6Nc7myS0i4vTq5fAcHmgACK78xGwh2SVMpi6kfPJNL5AEAAwIAA3MAAzME",
+            #                         caption=msg
+            #                         # , reply_markup=markups.mmark()
+            #                         )
+            logging.debug(s)
             # user_bot.send_message(x[1], txt)
             conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
             conectionuser.commit()
-            time.sleep(0.1)
+            time.sleep(0.03)
         except telebot.apihelper.ApiTelegramException as e:
 
             if "user is deactivated" in str(e):
-                logging.error("User Deactivated"+str(x[0]))
+                logging.error("User Deactivated" + str(x[0]))
                 conectionuser.execute("delete from users where id==?", (x[0],))
                 conectionuser.commit()
             if "bot was blocked by the user":
@@ -124,6 +134,7 @@ def send_to_users(message: Message):
     bot.send_message(message.chat.id, "انجام شد",
                      reply_markup=markups.main_menu_keyboard_markup())
     return
+
 
 def message_to_html(message: Message):
     text = message.text
@@ -194,7 +205,6 @@ def add_user_usage_days(message: Message, server_id):
 
 # Add User - Confirm to add user
 def confirm_add_user(message: Message, server_id):
-    
     if message.text == KEY_MARKUP['CANCEL']:
         bot.send_message(message.chat.id, MESSAGES['CANCEL_ADD_USER'], reply_markup=markups.main_menu_keyboard_markup())
         return
@@ -357,6 +367,7 @@ def search_user_config(message: Message, server_id):
     bot.send_message(message.chat.id, templates.user_info_template(user, server, MESSAGES['SEARCH_RESULT']),
                      reply_markup=markups.user_info_markup(user['uuid']))
 
+
 # All Servers Search User - Name
 def all_server_search_user_name(message: Message):
     global searched_name
@@ -397,13 +408,13 @@ def all_server_search_user_uuid(message: Message):
             if user:
                 selected_server = server
                 break
-    
+
     bot.delete_message(message.chat.id, msg_wait.message_id)
     if not user:
         bot.send_message(message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'],
                          reply_markup=markups.main_menu_keyboard_markup())
         return
-    
+
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_USER'], reply_markup=markups.main_menu_keyboard_markup())
     bot.send_message(message.chat.id, templates.user_info_template(user, selected_server, MESSAGES['SEARCH_RESULT']),
                      reply_markup=markups.user_info_markup(user['uuid']))
@@ -423,7 +434,7 @@ def all_server_search_user_config(message: Message):
             if user:
                 selected_server = server
                 break
-    
+
     bot.delete_message(message.chat.id, msg_wait.message_id)
     if not user:
         bot.send_message(message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'],
@@ -432,6 +443,7 @@ def all_server_search_user_config(message: Message):
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_USER'], reply_markup=markups.main_menu_keyboard_markup())
     bot.send_message(message.chat.id, templates.user_info_template(user, selected_server, MESSAGES['SEARCH_RESULT']),
                      reply_markup=markups.user_info_markup(user['uuid']))
+
 
 # ----------------------------------- Users Bot Search Area -----------------------------------
 # User Bot Search  - Name
@@ -445,13 +457,14 @@ def search_bot_user_name(message: Message):
         bot.send_message(message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'],
                          reply_markup=markups.main_menu_keyboard_markup())
         return
-    users.sort(key = operator.itemgetter('created_at'), reverse=True)
+    users.sort(key=operator.itemgetter('created_at'), reverse=True)
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_USER'], reply_markup=markups.main_menu_keyboard_markup())
 
     wallets_list = USERS_DB.select_wallet()
     orders_list = USERS_DB.select_orders()
     msg = templates.bot_users_list_template(users, wallets_list, orders_list)
     bot.send_message(message.chat.id, msg, reply_markup=markups.bot_users_list_markup(users))
+
 
 # User Bot Search  - Name
 def search_bot_user_telegram_id(message: Message):
@@ -465,7 +478,7 @@ def search_bot_user_telegram_id(message: Message):
     users = USERS_DB.find_user(telegram_id=int(searched_id))
     if not users:
         bot.send_message(message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'],
-                        reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         return
     user = users[0]
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_USER'], reply_markup=markups.main_menu_keyboard_markup())
@@ -493,31 +506,33 @@ def search_bot_user_order(message: Message):
     orders = USERS_DB.find_order(id=int(message.text))
     if not orders:
         bot.send_message(message.chat.id, MESSAGES['ERROR_ORDER_NOT_FOUND'],
-                        reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         return
     order = orders[0]
-    bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_ORDER'], reply_markup=markups.main_menu_keyboard_markup())
+    bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_ORDER'],
+                     reply_markup=markups.main_menu_keyboard_markup())
     plans = USERS_DB.find_plan(id=order['plan_id'])
     if not plans:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                            reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         return
     plan = plans[0]
-    #subs = 
+    # subs =
     users = USERS_DB.find_user(telegram_id=order['telegram_id'])
     if not users:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                            reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         return
     user = users[0]
     servers = USERS_DB.find_server(id=plan['server_id'])
     if not servers:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                            reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         return
     server = servers[0]
     msg = templates.bot_orders_info_template(order, plan, user, server)
     bot.send_message(message.chat.id, msg)
+
 
 # User Bot Search  - Payment
 def search_bot_user_payment(message: Message):
@@ -529,25 +544,26 @@ def search_bot_user_payment(message: Message):
     payments = USERS_DB.find_payment(id=int(message.text))
     if not payments:
         bot.send_message(message.chat.id, MESSAGES['ERROR_ORDER_NOT_FOUND'],
-                        reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         return
-    bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_PAYMENT'], reply_markup=markups.main_menu_keyboard_markup())
+    bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_PAYMENT'],
+                     reply_markup=markups.main_menu_keyboard_markup())
     payment = payments[0]
     user_data = USERS_DB.find_user(telegram_id=payment['telegram_id'])
     if not user_data:
         bot.send_message(message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'],
-                            reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         return
     user_data = user_data[0]
-    
-    msg = templates.bot_payment_info_template(payment,user_data)
+
+    msg = templates.bot_payment_info_template(payment, user_data)
     photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', payment['payment_image'])
     bot.send_photo(message.chat.id, photo=open(photo_path, 'rb'),
-                caption=msg, reply_markup=markups.change_status_payment_by_admin(payment['id']))
+                   caption=msg, reply_markup=markups.change_status_payment_by_admin(payment['id']))
 
 
 # ----------------------------------- Users Bot Management Area -----------------------------------
-#add_plan_data = {}
+# add_plan_data = {}
 
 
 # Add Plan - Size
@@ -622,10 +638,10 @@ def add_server_url(message: Message):
         for server in servers:
             if server['url'] == url:
                 bot.reply_to(message, MESSAGES['ERROR_SAME_SERVER_URL'],
-                            reply_markup=markups.while_edit_user_markup())
+                             reply_markup=markups.while_edit_user_markup())
                 bot.register_next_step_handler(message, add_server_url)
                 return
-                
+
     add_server_data['url'] = url
     bot.send_message(message.chat.id, MESSAGES['ADD_SERVER_USER_LIMIT'],
                      reply_markup=markups.while_edit_user_markup())
@@ -641,7 +657,8 @@ def add_server_user_limit(message: Message):
         return
     add_server_data['user_limit'] = int(message.text)
     msg_wait = bot.send_message(message.chat.id, MESSAGES['WAIT'], reply_markup=markups.while_edit_user_markup())
-    status = utils.add_server(url=add_server_data['url'], user_limit=add_server_data['user_limit'], title=add_server_data['title'])
+    status = utils.add_server(url=add_server_data['url'], user_limit=add_server_data['user_limit'],
+                              title=add_server_data['title'])
     bot.delete_message(message.chat.id, msg_wait.message_id)
     if not status:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
@@ -651,7 +668,8 @@ def add_server_user_limit(message: Message):
     servers = USERS_DB.select_servers()
     bot.send_message(message.chat.id, KEY_MARKUP['SERVERS_MANAGEMENT'],
                      reply_markup=markups.servers_management_markup(servers))
-    
+
+
 # Edit Server - Server Title
 def edit_server_title(message: Message, server_id):
     if is_it_cancel(message):
@@ -667,10 +685,11 @@ def edit_server_title(message: Message, server_id):
     bot.send_message(message.chat.id, f"{MESSAGES['SUCCESS_SERVER_TITLE_EDITED']}{server['title']}",
                      reply_markup=markups.main_menu_keyboard_markup())
     plans = USERS_DB.select_plans()
-    msg = templates.server_info_template(server,plans)
+    msg = templates.server_info_template(server, plans)
     bot.send_message(message.chat.id, msg,
                      reply_markup=markups.server_edit_markup(server_id))
-    
+
+
 # Edit Server - Server User Limit
 def edit_server_user_limit(message: Message, server_id):
     if is_it_cancel(message):
@@ -689,9 +708,10 @@ def edit_server_user_limit(message: Message, server_id):
     bot.send_message(message.chat.id, f"{MESSAGES['SUCCESS_SERVER_USER_LIMIT_EDITED']}{server['user_limit']}",
                      reply_markup=markups.main_menu_keyboard_markup())
     plans = USERS_DB.select_plans()
-    msg = templates.server_info_template(server,plans)
+    msg = templates.server_info_template(server, plans)
     bot.send_message(message.chat.id, msg,
                      reply_markup=markups.server_edit_markup(server_id))
+
 
 # Edit Server - Server Url
 def edit_server_url(message: Message, server_id):
@@ -702,7 +722,7 @@ def edit_server_url(message: Message, server_id):
     bot.delete_message(message.chat.id, msg_wait.message_id)
     if not url:
         bot.send_message(message.chat.id, MESSAGES['ERROR_ADD_SERVER_URL'],
-                     reply_markup=markups.while_edit_user_markup())
+                         reply_markup=markups.while_edit_user_markup())
         bot.register_next_step_handler(message, edit_server_url, server_id)
         return
     servers = USERS_DB.select_servers()
@@ -710,7 +730,7 @@ def edit_server_url(message: Message, server_id):
         for server in servers:
             if server['url'] == url:
                 bot.reply_to(message, MESSAGES['ERROR_SAME_SERVER_URL'],
-                            reply_markup=markups.while_edit_user_markup())
+                             reply_markup=markups.while_edit_user_markup())
                 bot.register_next_step_handler(message, edit_server_url, server_id)
                 return
     status = USERS_DB.edit_server(int(server_id), url=url)
@@ -725,7 +745,7 @@ def edit_server_url(message: Message, server_id):
     bot.send_message(message.chat.id, f"{MESSAGES['SUCCESS_SERVER_URL_EDITED']}\n{server['url']}",
                      reply_markup=markups.main_menu_keyboard_markup())
     plans = USERS_DB.select_plans()
-    msg = templates.server_info_template(server,plans)
+    msg = templates.server_info_template(server, plans)
     bot.send_message(message.chat.id, msg,
                      reply_markup=markups.server_edit_markup(server_id))
 
@@ -771,6 +791,8 @@ def users_bot_add_plan_price(message: Message):
     bot.send_message(message.chat.id, MESSAGES['USERS_BOT_ADD_PLAN_DESC'],
                      reply_markup=markups.while_edit_skip_user_markup())
     bot.register_next_step_handler(message, users_bot_add_plan_description)
+
+
 def users_bot_add_plan_description(message: Message):
     if is_it_cancel(message):
         return
@@ -778,7 +800,7 @@ def users_bot_add_plan_description(message: Message):
         add_plan_data['description'] = None
     else:
         add_plan_data['description'] = message.text
-    
+
     msg_wait = bot.send_message(message.chat.id, MESSAGES['WAIT'], reply_markup=markups.while_edit_user_markup())
     status = utils.users_bot_add_plan(add_plan_data['usage'], add_plan_data['days'],
                                       add_plan_data['price'], add_plan_data['server_id'], add_plan_data['description'])
@@ -794,13 +816,11 @@ def users_bot_add_plan_description(message: Message):
         for plan in plans:
             if plan['status']:
                 if plan['server_id'] == int(add_plan_data['server_id']):
-                        plans_list.append(plan)
-        plans_markup = markups.plans_list_markup(plans_list,add_plan_data['server_id'])
+                    plans_list.append(plan)
+        plans_markup = markups.plans_list_markup(plans_list, add_plan_data['server_id'])
         bot.send_message(message.chat.id, {MESSAGES['USERS_BOT_PLANS_LIST']},
                          reply_markup=plans_markup)
 
-
-    
 
 # Users Bot - Edit Owner Info - Username
 def users_bot_edit_owner_info_username(message: Message):
@@ -874,7 +894,7 @@ def users_bot_send_msg_users(message: Message):
 
 
 # Users Bot - Settings - Update Message
-def users_bot_settings_update_message(message: Message, markup,title=MESSAGES['USERS_BOT_SETTINGS']):
+def users_bot_settings_update_message(message: Message, markup, title=MESSAGES['USERS_BOT_SETTINGS']):
     settings = utils.all_configs_settings()
 
     bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id,
@@ -952,7 +972,7 @@ def users_bot_sub_status(message: Message):
         bot.send_message(message.chat.id, MESSAGES['ERROR_SUB_NOT_FOUND'],
                          reply_markup=markups.main_menu_keyboard_markup())
         return
-    
+
     if not bot_user:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'],
                          reply_markup=markups.main_menu_keyboard_markup())
@@ -975,12 +995,10 @@ def users_bot_sub_status(message: Message):
                              reply_markup=markups.main_menu_keyboard_markup())
             return
         bot.send_message(message.chat.id, MESSAGES['SUCCESS_SEARCH_SUB'],
-                             reply_markup=markups.main_menu_keyboard_markup())
+                         reply_markup=markups.main_menu_keyboard_markup())
         msg = templates.user_info_template(usr, selected_server)
         bot.send_message(message.chat.id, msg,
-                        reply_markup=markups.sub_search_info_markup(usr['uuid'], bot_user))
-
-
+                         reply_markup=markups.sub_search_info_markup(usr['uuid'], bot_user))
 
 
 def users_bot_settings_min_depo(message: Message):
@@ -1015,28 +1033,30 @@ def users_bot_settings_channel_id(message: Message):
 def users_bot_settings_welcome_msg(message: Message):
     if is_it_cancel(message):
         return
-    
+
     status = USERS_DB.edit_str_config("msg_user_start", value=message.html_text)
     if not status:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
         return
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_UPDATE_DATA'], reply_markup=markups.main_menu_keyboard_markup())
 
+
 def users_bot_settings_set_faq_msg(message: Message, msg):
     if is_it_cancel(message):
         return
-    
+
     status = USERS_DB.edit_str_config("msg_faq", value=message.html_text)
     if not status:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
         return
     try:
         bot.edit_message_reply_markup(message.chat.id, msg.message_id,
-                                  reply_markup=markups.users_bot_management_settings_faq_markup())
+                                      reply_markup=markups.users_bot_management_settings_faq_markup())
     except:
         pass
 
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_UPDATE_DATA'], reply_markup=markups.main_menu_keyboard_markup())
+
 
 def users_bot_settings_test_sub_size(message: Message):
     if is_it_cancel(message):
@@ -1048,7 +1068,7 @@ def users_bot_settings_test_sub_size(message: Message):
     if '.' in message.text:
         new_test_sub_size = float(message.text)
     else:
-        new_test_sub_size = int(message.text)  
+        new_test_sub_size = int(message.text)
     status = USERS_DB.edit_int_config("test_sub_size_gb", value=new_test_sub_size)
     if not status:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
@@ -1110,6 +1130,7 @@ def users_bot_settings_panel_manual(message: Message, db_key):
         return
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_UPDATE_DATA'], reply_markup=markups.main_menu_keyboard_markup())
 
+
 def users_bot_settings_restore_bot(message: Message):
     if is_it_cancel(message):
         return
@@ -1117,20 +1138,21 @@ def users_bot_settings_restore_bot(message: Message):
     file_name = message.document.file_name
     file_info = bot.get_file(message.document.file_id)
     downloaded_file = bot.download_file(file_info.file_path)
-    file_save_path = os.path.join(BOT_BACKUP_LOC,"Restore")
+    file_save_path = os.path.join(BOT_BACKUP_LOC, "Restore")
     if not os.path.exists(file_save_path):
         os.makedirs(file_save_path)
-        
+
     # save in Backup/bot/restore
-    
-    with open(os.path.join(file_save_path,file_name), 'wb') as new_file:
+
+    with open(os.path.join(file_save_path, file_name), 'wb') as new_file:
         new_file.write(downloaded_file)
-        
-    restore_status = utils.restore_json_bot(os.path.join(file_save_path,file_name))
+
+    restore_status = utils.restore_json_bot(os.path.join(file_save_path, file_name))
     if not restore_status:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
         return
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_RESTORE_BOT'], reply_markup=markups.main_menu_keyboard_markup())
+
 
 def users_bot_settings_renewal_method_advanced_days(message: Message):
     if is_it_cancel(message):
@@ -1143,6 +1165,7 @@ def users_bot_settings_renewal_method_advanced_days(message: Message):
     if not status:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_UPDATE_DATA'], reply_markup=markups.main_menu_keyboard_markup())
+
 
 def users_bot_settings_renewal_method_advanced_usage(message: Message):
     if is_it_cancel(message):
@@ -1159,7 +1182,8 @@ def users_bot_settings_renewal_method_advanced_usage(message: Message):
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_UPDATE_DATA'], reply_markup=markups.main_menu_keyboard_markup())
 
-def edit_wallet_balance(message: Message,telegram_id):
+
+def edit_wallet_balance(message: Message, telegram_id):
     if is_it_cancel(message):
         return
     if not is_it_digit(message, markup=markups.while_edit_user_markup()):
@@ -1170,14 +1194,14 @@ def edit_wallet_balance(message: Message,telegram_id):
     if not wallet_status:
         status = USERS_DB.add_wallet(telegram_id=telegram_id)
         if not status:
-                bot.send_message(message.chat.id, MESSAGES['UNKNOWN_ERROR'])
-                return
+            bot.send_message(message.chat.id, MESSAGES['UNKNOWN_ERROR'])
+            return
     status = USERS_DB.edit_wallet(telegram_id=telegram_id, balance=new_balance)
     if not status:
         bot.send_message(message.chat.id, MESSAGES['UNKNOWN_ERROR'])
     bot.send_message(message.chat.id, MESSAGES['SUCCESS_UPDATE_DATA'], reply_markup=markups.main_menu_keyboard_markup())
-    user_bot.send_message(telegram_id, f"{MESSAGES['WALLET_BALANCE_CHANGED_BY_ADMIN_P1']} {message.text} {MESSAGES['WALLET_BALANCE_CHANGED_BY_ADMIN_P2']}")
-    
+    user_bot.send_message(telegram_id,
+                          f"{MESSAGES['WALLET_BALANCE_CHANGED_BY_ADMIN_P1']} {message.text} {MESSAGES['WALLET_BALANCE_CHANGED_BY_ADMIN_P2']}")
 
 
 def send_message_to_user(message: Message, payment_id):
@@ -1186,23 +1210,26 @@ def send_message_to_user(message: Message, payment_id):
     payment_info = USERS_DB.find_payment(id=int(payment_id))
     if not payment_info:
         bot.send_message(message.chat.id,
-                            f"{MESSAGES['ERROR_PAYMENT_NOT_FOUND']}\n{MESSAGES['ORDER_ID']} {payment_id}")
+                         f"{MESSAGES['ERROR_PAYMENT_NOT_FOUND']}\n{MESSAGES['ORDER_ID']} {payment_id}")
         return
     payment_info = payment_info[0]
     user_bot.send_message(int(payment_info['telegram_id']),
-                        f"{MESSAGES['ADMIN']}\n{message.text}\n{MESSAGES['ORDER_ID']} {payment_id}",
-                        reply_markup=markups.send_message_to_user_markup(message.chat.id))
+                          f"{MESSAGES['ADMIN']}\n{message.text}\n{MESSAGES['ORDER_ID']} {payment_id}",
+                          reply_markup=markups.send_message_to_user_markup(message.chat.id))
     bot.send_message(message.chat.id, MESSAGES['MESSAGE_SENDED'],
-                        reply_markup=markups.main_menu_keyboard_markup())
-    
+                     reply_markup=markups.main_menu_keyboard_markup())
+
+
 def users_bot_send_message_to_user(message: Message, telegram_id):
     if is_it_cancel(message):
         return
     user_bot.send_message(int(telegram_id),
-                        f"{MESSAGES['MESSAGE_FROM_ADMIN']}\n{MESSAGES['MESSAGE_TEXT']} {message.text}", reply_markup=markups.send_message_to_user_markup(message.chat.id))
+                          f"{MESSAGES['MESSAGE_FROM_ADMIN']}\n{MESSAGES['MESSAGE_TEXT']} {message.text}",
+                          reply_markup=markups.send_message_to_user_markup(message.chat.id))
     bot.send_message(message.chat.id, MESSAGES['MESSAGE_SENDED'],
-                        reply_markup=markups.main_menu_keyboard_markup())
-    
+                     reply_markup=markups.main_menu_keyboard_markup())
+
+
 # ----------------------------------- Callbacks -----------------------------------
 # Callback Handler for Inline Buttons
 @bot.callback_query_handler(func=lambda call: True)
@@ -1219,17 +1246,17 @@ def callback_query(call: CallbackQuery):
     key = data[0]
     value = data[1]
     global URL
-    #Single , Single_name , Single_expired , All_server_name , All_server_expired
+    # Single , Single_name , Single_expired , All_server_name , All_server_expired
     global search_mode
     # All , Single
     global server_mode
     global searched_name
-    global selected_server 
-    #User_Orders, User_Payments, User_Gifts, Orders, Approved_Payments
-    #Non_Approved_Payments, Pending_Payments, Card_Payments, Digital_Payments
-    #Bot_User, Bot_Users_Search_Name, User_Refferals
-    global list_mode 
-    #Order, Payment, Gift
+    global selected_server
+    # User_Orders, User_Payments, User_Gifts, Orders, Approved_Payments
+    # Non_Approved_Payments, Pending_Payments, Card_Payments, Digital_Payments
+    # Bot_User, Bot_Users_Search_Name, User_Refferals
+    global list_mode
+    # Order, Payment, Gift
     global item_mode
     global selected_telegram_id
     # ----------------------------------- Users List Area Callbacks -----------------------------------
@@ -1251,7 +1278,7 @@ def callback_query(call: CallbackQuery):
             return
         msg = templates.user_info_template(usr, selected_server)
         bot.send_message(call.message.chat.id, msg,
-                        reply_markup=markups.user_info_markup(usr['uuid']))
+                         reply_markup=markups.user_info_markup(usr['uuid']))
 
 
     # Next Page Callback
@@ -1290,7 +1317,7 @@ def callback_query(call: CallbackQuery):
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'])
             return
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.users_list_markup(server_id, users_list, int(value)))
+                                      reply_markup=markups.users_list_markup(server_id, users_list, int(value)))
 
     # ----------------------------------- Single User Info Area Callbacks -----------------------------------
     # Delete User Callback
@@ -1398,7 +1425,7 @@ def callback_query(call: CallbackQuery):
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_CONFIG_NOT_FOUND'])
             return
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.sub_user_list_markup(value,configs))
+                                      reply_markup=markups.sub_user_list_markup(value, configs))
     # User Configs - VLESS Configs Callback
     elif key == "conf_dir_vless":
         sub = utils.sub_links(value, URL)
@@ -1458,7 +1485,7 @@ def callback_query(call: CallbackQuery):
     elif key == 'configs_list':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                       reply_markup=markups.sub_url_user_list_markup(value))
-        
+
     # User Configs - Subscription Configs Callback
     elif key == "conf_sub_url":
         sub = utils.sub_links(value, URL)
@@ -1640,9 +1667,9 @@ def callback_query(call: CallbackQuery):
         URL = server['url'] + API_PATH
         selected_server = server
         plans = USERS_DB.select_plans()
-        msg = templates.server_info_template(server,plans)
+        msg = templates.server_info_template(server, plans)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.server_selected_markup(value))
+                              reply_markup=markups.server_selected_markup(value))
 
     # Server Management - Add Server Callback
     elif key == "add_server":
@@ -1654,19 +1681,19 @@ def callback_query(call: CallbackQuery):
     # Server Management - Delete Server Callback
     elif key == "delete_server":
         bot.edit_message_text(MESSAGES['DELETE_SERVER_QUESTION'], call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.server_delete_markup(value))
-    
+                              reply_markup=markups.server_delete_markup(value))
+
     # Server Management - Edit Server Callback
     elif key == "edit_server":
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.server_edit_markup(value))
-        
+                                      reply_markup=markups.server_edit_markup(value))
+
     # Server Management - Edit Title Server Callback
     elif key == "server_edit_title":
         bot.send_message(call.message.chat.id, MESSAGES['ADD_SERVER_TITLE'],
                          reply_markup=markups.while_edit_user_markup())
         bot.register_next_step_handler(call.message, edit_server_title, value)
-        
+
     # Server Management - Edit User Limit Server Callback
     elif key == "server_edit_user_limit":
         bot.send_message(call.message.chat.id, MESSAGES['ADD_SERVER_USER_LIMIT'],
@@ -1681,22 +1708,23 @@ def callback_query(call: CallbackQuery):
     # Server Management - Confirm Delete Server Callback
     elif key == "confirm_delete_server":
         server_id = int(value)
-        #status = USERS_DB.edit_server(value, status=0)
+        # status = USERS_DB.edit_server(value, status=0)
         status = USERS_DB.delete_server(id=server_id)
         if not status:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
             return
-        
+
         USERS_DB.delete_plan(server_id=server_id)
         USERS_DB.delete_order_subscription(server_id=server_id)
         USERS_DB.delete_non_order_subscription(server_id=server_id)
-    
+
         servers = USERS_DB.select_servers()
         bot.edit_message_text(KEY_MARKUP['SERVERS_MANAGEMENT'], call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.servers_management_markup(servers)) 
-        bot.send_message(call.message.chat.id, MESSAGES['SUCCESS_REMOVED_SERVER'], reply_markup=markups.main_menu_keyboard_markup())
+                              reply_markup=markups.servers_management_markup(servers))
+        bot.send_message(call.message.chat.id, MESSAGES['SUCCESS_REMOVED_SERVER'],
+                         reply_markup=markups.main_menu_keyboard_markup())
 
-        
+
     # Server Management - List of Plans for Server Callback
     elif key == "server_list_of_plans":
         plans_list = []
@@ -1706,10 +1734,10 @@ def callback_query(call: CallbackQuery):
                 if plan['status']:
                     if plan['server_id'] == int(value):
                         plans_list.append(plan)
-        plans_markup = markups.plans_list_markup(plans_list,value)
+        plans_markup = markups.plans_list_markup(plans_list, value)
         bot.edit_message_text({MESSAGES['USERS_BOT_PLANS_LIST']}, call.message.chat.id, call.message.message_id,
-                         reply_markup=plans_markup)
-        
+                              reply_markup=plans_markup)
+
     elif key == "server_list_of_users":
         users_list = api.select(URL)
         search_mode = "Single"
@@ -1719,25 +1747,25 @@ def callback_query(call: CallbackQuery):
         msg = templates.users_list_template(users_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.users_list_markup(value, users_list))
-    
+
     elif key == "server_add_user":
         global add_user_data
         bot.send_message(call.message.chat.id, MESSAGES['ADD_USER_NAME'], reply_markup=markups.while_edit_user_markup())
         bot.register_next_step_handler(call.message, add_user_name, value)
 
     elif key == "server_search_user":
-        bot.edit_message_text(MESSAGES['SEARCH_USER'],call.message.chat.id, call.message.message_id, 
+        bot.edit_message_text(MESSAGES['SEARCH_USER'], call.message.chat.id, call.message.message_id,
                               reply_markup=markups.search_user_markup(server_id=value))
 
     # ----------------------------------- Users Bot Management Callbacks -----------------------------------
     elif key == "users_bot_management_menu":
         bot.edit_message_text(KEY_MARKUP['USERS_BOT_MANAGEMENT'], call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.users_bot_management_markup())
-        
+                              reply_markup=markups.users_bot_management_markup())
+
     elif key == "bot_users_list_management":
-         bot.edit_message_text(KEY_MARKUP['BOT_USERS_MANAGEMENT'], call.message.chat.id, call.message.message_id,
+        bot.edit_message_text(KEY_MARKUP['BOT_USERS_MANAGEMENT'], call.message.chat.id, call.message.message_id,
                               reply_markup=markups.users_bot_users_management_markup())
-        
+
     elif key == "bot_users_list":
         list_mode = "Bot_Users"
         users_list = USERS_DB.select_users()
@@ -1746,16 +1774,16 @@ def callback_query(call: CallbackQuery):
         if not users_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'])
             return
-        users_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        users_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_users_list_template(users_list, wallets_list, orders_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_users_list_markup(users_list))
-        users_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        users_list.sort(key=operator.itemgetter('created_at'), reverse=True)
     elif key == "search_users_bot":
-         
-         bot.edit_message_text(MESSAGES['SEARCH_USER'], call.message.chat.id, call.message.message_id,
-                          reply_markup=markups.users_bot_users_search_method_markup())
-    
+
+        bot.edit_message_text(MESSAGES['SEARCH_USER'], call.message.chat.id, call.message.message_id,
+                              reply_markup=markups.users_bot_users_search_method_markup())
+
     elif key == "bot_users_search_name":
         list_mode = "Bot_Users"
         bot.send_message(call.message.chat.id, MESSAGES['SEARCH_USER_NAME'],
@@ -1771,9 +1799,9 @@ def callback_query(call: CallbackQuery):
         selected_telegram_id = value
         users = USERS_DB.find_user(telegram_id=int(value))
         if not users:
-             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                              reply_markup=markups.main_menu_keyboard_markup())
-             return
+            bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
+                             reply_markup=markups.main_menu_keyboard_markup())
+            return
         user = users[0]
         orders = USERS_DB.find_order(telegram_id=user['telegram_id'])
         paymets = USERS_DB.find_payment(telegram_id=user['telegram_id'])
@@ -1789,17 +1817,17 @@ def callback_query(call: CallbackQuery):
 
     elif key == "bot_user_next":
         if list_mode == "Bot_Users":
-           users_list = USERS_DB.select_users()
+            users_list = USERS_DB.select_users()
         elif list_mode == "Bot_Users_Search_Name":
             users_list = USERS_DB.find_user(full_name=searched_name)
         elif list_mode == "User_Refferals":
             users_list = USERS_DB.find_user(telegram_id=int(selected_telegram_id))
         if not users_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'])
-            return 
-        users_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+            return
+        users_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.bot_users_list_markup(users_list, int(value)))
+                                      reply_markup=markups.bot_users_list_markup(users_list, int(value)))
 
 
     elif key == "bot_user_item_info":
@@ -1807,26 +1835,26 @@ def callback_query(call: CallbackQuery):
             orders = USERS_DB.find_order(id=int(value))
             if not orders:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
+                                 reply_markup=markups.main_menu_keyboard_markup())
                 return
             order = orders[0]
             plans = USERS_DB.find_plan(id=order['plan_id'])
             if not plans:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
+                                 reply_markup=markups.main_menu_keyboard_markup())
                 return
             plan = plans[0]
-            #subs = 
+            # subs =
             users = USERS_DB.find_user(telegram_id=order['telegram_id'])
             if not users:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
+                                 reply_markup=markups.main_menu_keyboard_markup())
                 return
             user = users[0]
             servers = USERS_DB.find_server(id=plan['server_id'])
             if not servers:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
+                                 reply_markup=markups.main_menu_keyboard_markup())
                 return
             server = servers[0]
             msg = templates.bot_orders_info_template(order, plan, user, server)
@@ -1842,14 +1870,14 @@ def callback_query(call: CallbackQuery):
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'])
                 return
             user_data = user_data[0]
-            msg = templates.bot_payment_info_template(payment,user_data)
+            msg = templates.bot_payment_info_template(payment, user_data)
             photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', payment['payment_image'])
             if payment['approved'] == None:
                 bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'),
-                            caption=msg, reply_markup=markups.confirm_payment_by_admin(payment['id']))
+                               caption=msg, reply_markup=markups.confirm_payment_by_admin(payment['id']))
             else:
                 bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'),
-                            caption=msg, reply_markup=markups.change_status_payment_by_admin(payment['id']))
+                               caption=msg, reply_markup=markups.change_status_payment_by_admin(payment['id']))
         elif item_mode == "Gift":
             gift = USERS_DB.find_user_plans(id=int(value))
 
@@ -1879,11 +1907,11 @@ def callback_query(call: CallbackQuery):
             item_list = [payment for payment in payments_list if payment['payment_method'] == "Digital"]
         if not item_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'])
-            return 
+            return
         if not list_mode == "User_Gifts":
-            item_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+            item_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.bot_user_item_list_markup(item_list, int(value)))
+                                      reply_markup=markups.bot_user_item_list_markup(item_list, int(value)))
 
     elif key == "bot_users_sub_user_list":
         server_mode = "All"
@@ -1901,12 +1929,12 @@ def callback_query(call: CallbackQuery):
         list_mode = "User_Orders"
         item_mode = "Order"
         orders_list = USERS_DB.find_order(telegram_id=int(value))
-        
+
         plans_list = USERS_DB.select_plans()
         if not orders_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_ORDER_NOT_FOUND'])
             return
-        orders_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        orders_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_orders_list_template(orders_list, plans_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(orders_list))
@@ -1918,22 +1946,22 @@ def callback_query(call: CallbackQuery):
         if not paymets:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_PAYMENT_NOT_FOUND'])
             return
-        paymets.sort(key = operator.itemgetter('created_at'), reverse=True)
+        paymets.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_payments_list_template(paymets)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(paymets))
-    
+
     elif key == "users_bot_wallet_edit_balance":
         bot.send_message(call.message.chat.id, MESSAGES['EDIT_WALLET_BALANCE'],
-                            reply_markup=markups.while_edit_user_markup())
+                         reply_markup=markups.while_edit_user_markup())
         bot.register_next_step_handler(call.message, edit_wallet_balance, value)
-    
+
     elif key == "users_bot_reset_test":
         users = USERS_DB.find_user(telegram_id=int(value))
         if not users:
-                bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
-                return
+            bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
+                             reply_markup=markups.main_menu_keyboard_markup())
+            return
         user = users[0]
         if user['test_subscription'] == 0:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_HAVE_TEST_SUB'])
@@ -1943,13 +1971,13 @@ def callback_query(call: CallbackQuery):
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
             return
         bot.send_message(call.message.chat.id, MESSAGES['SUCCESS_RESET_TEST_SUB'])
-    
+
     elif key == "users_bot_ban_user":
         users = USERS_DB.find_user(telegram_id=int(value))
         if not users:
-                bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
-                return
+            bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
+                             reply_markup=markups.main_menu_keyboard_markup())
+            return
         user = users[0]
         if user['banned'] == 0:
             status = USERS_DB.edit_user(telegram_id=int(value), banned=1)
@@ -1980,11 +2008,11 @@ def callback_query(call: CallbackQuery):
         list_mode = "User_Refferals"
         users = USERS_DB.find_user(telegram_id=int(value))
         if not users:
-             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                              reply_markup=markups.main_menu_keyboard_markup())
-             return
-        user = users[0] 
-        #referred_user = 
+            bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
+                             reply_markup=markups.main_menu_keyboard_markup())
+            return
+        user = users[0]
+        # referred_user =
 
 
 
@@ -2000,22 +2028,22 @@ def callback_query(call: CallbackQuery):
         if not orders_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_ORDER_NOT_FOUND'])
             return
-        orders_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        orders_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_orders_list_template(orders_list, plans_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(orders_list))
-        
+
 
     elif key == "search_orders":
         bot.send_message(call.message.chat.id, MESSAGES['ORDER_NUMBER_REQUEST'],
                          reply_markup=markups.while_edit_user_markup())
         bot.register_next_step_handler(call.message, search_bot_user_order)
-        
+
 
     elif key == "users_bot_payments_list_management":
-         bot.edit_message_text(KEY_MARKUP['PAYMENT_MANAGEMENT'], call.message.chat.id, call.message.message_id,
+        bot.edit_message_text(KEY_MARKUP['PAYMENT_MANAGEMENT'], call.message.chat.id, call.message.message_id,
                               reply_markup=markups.users_bot_payments_management_markup())
-        
+
     elif key == "search_payments":
         bot.send_message(call.message.chat.id, MESSAGES['PAYMENT_NUMBER_REQUEST'],
                          reply_markup=markups.while_edit_user_markup())
@@ -2032,7 +2060,7 @@ def callback_query(call: CallbackQuery):
         if not approved_payments_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_PAYMENT_NOT_FOUND'])
             return
-        approved_payments_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        approved_payments_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_payments_list_template(approved_payments_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(approved_payments_list))
@@ -2048,7 +2076,7 @@ def callback_query(call: CallbackQuery):
         if not non_approved_payments_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_PAYMENT_NOT_FOUND'])
             return
-        non_approved_payments_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        non_approved_payments_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_payments_list_template(non_approved_payments_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(non_approved_payments_list))
@@ -2064,7 +2092,7 @@ def callback_query(call: CallbackQuery):
         if not pending_payments_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_PAYMENT_NOT_FOUND'])
             return
-        pending_payments_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        pending_payments_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_payments_list_template(pending_payments_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(pending_payments_list))
@@ -2080,7 +2108,7 @@ def callback_query(call: CallbackQuery):
         if not card_payments_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_PAYMENT_NOT_FOUND'])
             return
-        card_payments_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        card_payments_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_payments_list_template(card_payments_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(card_payments_list))
@@ -2096,7 +2124,7 @@ def callback_query(call: CallbackQuery):
         if not digital_payments_list:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_PAYMENT_NOT_FOUND'])
             return
-        digital_payments_list.sort(key = operator.itemgetter('created_at'), reverse=True)
+        digital_payments_list.sort(key=operator.itemgetter('created_at'), reverse=True)
         msg = templates.bot_payments_list_template(digital_payments_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.bot_user_item_list_markup(digital_payments_list))
@@ -2112,7 +2140,7 @@ def callback_query(call: CallbackQuery):
 
     # Plan Management - Info Plan Callback
     elif key == "info_plan_selected":
-        plans= USERS_DB.find_plan(id=value)
+        plans = USERS_DB.find_plan(id=value)
         if not plans:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
             return
@@ -2120,7 +2148,7 @@ def callback_query(call: CallbackQuery):
         plan = plans[0]
         msg = templates.plan_info_template(plan, orders)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.plan_info_selected_markup(plan['server_id']))
+                              reply_markup=markups.plan_info_selected_markup(plan['server_id']))
 
 
 
@@ -2128,7 +2156,7 @@ def callback_query(call: CallbackQuery):
     elif key == "users_bot_del_plan":
         status = USERS_DB.edit_plan(value, status=0)
         if status:
-            plans= USERS_DB.find_plan(id=value)
+            plans = USERS_DB.find_plan(id=value)
             if not plans:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
                 return
@@ -2141,9 +2169,10 @@ def callback_query(call: CallbackQuery):
                     if plan['status']:
                         if plan['server_id'] == server_id:
                             plans_list.append(plan)
-            plans_markup = markups.plans_list_markup(plans_list, server_id,delete_mode = True)
-            bot.edit_message_text({MESSAGES['USERS_BOT_SELECT_PLAN_TO_DELETE']}, call.message.chat.id, call.message.message_id,
-                         reply_markup=plans_markup)
+            plans_markup = markups.plans_list_markup(plans_list, server_id, delete_mode=True)
+            bot.edit_message_text({MESSAGES['USERS_BOT_SELECT_PLAN_TO_DELETE']}, call.message.chat.id,
+                                  call.message.message_id,
+                                  reply_markup=plans_markup)
         else:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
 
@@ -2156,9 +2185,10 @@ def callback_query(call: CallbackQuery):
                 if plan['status']:
                     if plan['server_id'] == int(value):
                         plans_list.append(plan)
-        plans_markup = markups.plans_list_markup(plans_list,value,delete_mode = True)
-        bot.edit_message_text({MESSAGES['USERS_BOT_SELECT_PLAN_TO_DELETE']}, call.message.chat.id, call.message.message_id,
-                         reply_markup=plans_markup)
+        plans_markup = markups.plans_list_markup(plans_list, value, delete_mode=True)
+        bot.edit_message_text({MESSAGES['USERS_BOT_SELECT_PLAN_TO_DELETE']}, call.message.chat.id,
+                              call.message.message_id,
+                              reply_markup=plans_markup)
 
     # Owner Info - Edit Owner Info Callback
     elif key == "users_bot_owner_info":
@@ -2244,8 +2274,8 @@ def callback_query(call: CallbackQuery):
                 return
         settings = utils.all_configs_settings()
         users_bot_settings_update_message(call.message, markups.users_bot_management_settings_markup(settings))
-    
-    elif key == "users_bot_settings_bot_auto_backup": 
+
+    elif key == "users_bot_settings_bot_auto_backup":
         if value == "1":
             edit_config = USERS_DB.edit_bool_config("bot_auto_backup", value=False)
             if not edit_config:
@@ -2351,11 +2381,12 @@ def callback_query(call: CallbackQuery):
         settings = utils.all_configs_settings()
         status = USERS_DB.edit_str_config("msg_faq", value=None)
         if not status:
-            bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
+            bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
+                             reply_markup=markups.main_menu_keyboard_markup())
             return
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.users_bot_management_settings_faq_markup())
-        
+                                      reply_markup=markups.users_bot_management_settings_faq_markup())
+
     elif key == "users_bot_settings_test_sub_menu":
         settings = utils.all_configs_settings()
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
@@ -2441,12 +2472,14 @@ def callback_query(call: CallbackQuery):
         if not backup_file:
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
             return
-        bot.send_document(call.message.chat.id, open(backup_file, 'rb'),caption=MESSAGES['USERS_BOT_SETTINGS_BACKUP_BOT'])
-    
+        bot.send_document(call.message.chat.id, open(backup_file, 'rb'),
+                          caption=MESSAGES['USERS_BOT_SETTINGS_BACKUP_BOT'])
+
     elif key == "users_bot_settings_restore_bot":
-        bot.send_message(call.message.chat.id, MESSAGES['USERS_BOT_SETTINGS_RESTORE_BOT'], reply_markup=markups.while_edit_user_markup())
+        bot.send_message(call.message.chat.id, MESSAGES['USERS_BOT_SETTINGS_RESTORE_BOT'],
+                         reply_markup=markups.while_edit_user_markup())
         bot.register_next_step_handler(call.message, users_bot_settings_restore_bot)
-    
+
     elif key == "users_bot_settings_buy_sub_status":
         if value == "1":
             edit_config = USERS_DB.edit_bool_config("buy_subscription_status", value=False)
@@ -2474,12 +2507,13 @@ def callback_query(call: CallbackQuery):
                 return
         settings = utils.all_configs_settings()
         users_bot_settings_update_message(call.message, markups.users_bot_management_settings_markup(settings))
-    
+
     elif key == "users_bot_settings_renewal_method_menu":
         settings = utils.all_configs_settings()
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.users_bot_management_settings_renewal_method_markup(settings))
-    
+                                      reply_markup=markups.users_bot_management_settings_renewal_method_markup(
+                                          settings))
+
     elif key == "users_bot_settings_renewal_method":
         if value == "1":
             edit_config = USERS_DB.edit_int_config("renewal_method", value=1)
@@ -2497,8 +2531,9 @@ def callback_query(call: CallbackQuery):
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
                 return
         settings = utils.all_configs_settings()
-        users_bot_settings_update_message(call.message, markups.users_bot_management_settings_renewal_method_markup(settings))
-    
+        users_bot_settings_update_message(call.message,
+                                          markups.users_bot_management_settings_renewal_method_markup(settings))
+
     elif key == "users_bot_settings_renewal_method_advanced_days":
         settings = utils.all_configs_settings()
         bot.send_message(call.message.chat.id,
@@ -2522,23 +2557,27 @@ def callback_query(call: CallbackQuery):
         bot.register_next_step_handler(call.message, users_bot_sub_status)
 
     elif key == "users_bot_settings_reset_free_test_limit_question":
-        bot.edit_message_text(MESSAGES['USERS_BOT_SETTINGS_RESET_FREE_TEST_LIMIT_QUESTION'], call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.users_bot_management_settings_reset_free_test_markup())
-        
+        bot.edit_message_text(MESSAGES['USERS_BOT_SETTINGS_RESET_FREE_TEST_LIMIT_QUESTION'], call.message.chat.id,
+                              call.message.message_id,
+                              reply_markup=markups.users_bot_management_settings_reset_free_test_markup())
+
     elif key == "users_bot_management_settings_reset_free_test_confirm":
         users_list = USERS_DB.select_users()
-        free_test_bot_users =  [user for user in users_list if user['test_subscription']]
+        free_test_bot_users = [user for user in users_list if user['test_subscription']]
         if free_test_bot_users:
             for user in free_test_bot_users:
-                status = USERS_DB.edit_user(telegram_id=user['telegram_id'],test_subscription=False)
+                status = USERS_DB.edit_user(telegram_id=user['telegram_id'], test_subscription=False)
                 if not status:
-                    bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'], reply_markup=markups.main_menu_keyboard_markup())
+                    bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
+                                     reply_markup=markups.main_menu_keyboard_markup())
                     return
-            bot.send_message(call.message.chat.id, MESSAGES['SUCCESS_RESET_FREE_TEST'], reply_markup=markups.main_menu_keyboard_markup())
+            bot.send_message(call.message.chat.id, MESSAGES['SUCCESS_RESET_FREE_TEST'],
+                             reply_markup=markups.main_menu_keyboard_markup())
         else:
-            bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'], reply_markup=markups.main_menu_keyboard_markup())
-            
-            
+            bot.send_message(call.message.chat.id, MESSAGES['ERROR_USER_NOT_FOUND'],
+                             reply_markup=markups.main_menu_keyboard_markup())
+
+
 
 
     # ----------------------------------- Payment Callbacks -----------------------------------
@@ -2558,11 +2597,11 @@ def callback_query(call: CallbackQuery):
             bot.send_message(call.message.chat.id,
                              f"{MESSAGES['ERROR_PAYMENT_ALREADY_CONFIRMED']}\n{MESSAGES['ORDER_ID']} {payment_id}")
             return
-        
+
         wallet = USERS_DB.find_wallet(telegram_id=payment_info['telegram_id'])
         if not wallet:
             create_wallet_status = USERS_DB.add_wallet(payment_info['telegram_id'])
-            if not create_wallet_status: 
+            if not create_wallet_status:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
                 return
             wallet = USERS_DB.find_wallet(telegram_id=payment_info['telegram_id'])
@@ -2619,9 +2658,10 @@ def callback_query(call: CallbackQuery):
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
             return
         user_data = user_data[0]
-        msg = templates.bot_payment_info_template(payment,user_data, footer=MESSAGES['CHANGE_STATUS_PAYMENT_CONFIRM_REQUEST'])
+        msg = templates.bot_payment_info_template(payment, user_data,
+                                                  footer=MESSAGES['CHANGE_STATUS_PAYMENT_CONFIRM_REQUEST'])
         bot.edit_message_caption(msg, call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.confirm_change_status_payment_by_admin(value))
+                                 reply_markup=markups.confirm_change_status_payment_by_admin(value))
     # Payment - Confirm change status Payment Callback
     elif key == "confirm_change_status_payment_by_admin":
         if not CLIENT_TOKEN:
@@ -2656,13 +2696,13 @@ def callback_query(call: CallbackQuery):
                     bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
                     return
                 user_data = user_data[0]
-                msg = templates.bot_payment_info_template(payment,user_data)
+                msg = templates.bot_payment_info_template(payment, user_data)
                 bot.edit_message_caption(msg, call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.change_status_payment_by_admin(value))
+                                         reply_markup=markups.change_status_payment_by_admin(value))
                 user_bot.send_message(int(payment['telegram_id']),
-                                    f"{MESSAGES['PAYMENT_CHANGED_TO_NOT_CONFIRMED']}\n{MESSAGES['ORDER_ID']} {payment_id}")
+                                      f"{MESSAGES['PAYMENT_CHANGED_TO_NOT_CONFIRMED']}\n{MESSAGES['ORDER_ID']} {payment_id}")
                 bot.send_message(call.message.chat.id,
-                                f"{MESSAGES['PAYMENT_CHANGED_TO_NOT_CONFIRMED_ADMIN']}\n{MESSAGES['ORDER_ID']} {payment_id}")
+                                 f"{MESSAGES['PAYMENT_CHANGED_TO_NOT_CONFIRMED_ADMIN']}\n{MESSAGES['ORDER_ID']} {payment_id}")
 
         elif payment['approved'] == False:
             payment_status = USERS_DB.edit_payment(payment_id, approved=True)
@@ -2687,14 +2727,14 @@ def callback_query(call: CallbackQuery):
                     bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
                     return
                 user_data = user_data[0]
-                msg = templates.bot_payment_info_template(payment,user_data)
+                msg = templates.bot_payment_info_template(payment, user_data)
                 bot.edit_message_caption(msg, call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.change_status_payment_by_admin(value))
+                                         reply_markup=markups.change_status_payment_by_admin(value))
                 user_bot.send_message(int(payment['telegram_id']),
-                                    f"{MESSAGES['WALLET_CHANGED_TO_PAYMENT_CONFIRMED']}\n{MESSAGES['ORDER_ID']} {payment_id}")
+                                      f"{MESSAGES['WALLET_CHANGED_TO_PAYMENT_CONFIRMED']}\n{MESSAGES['ORDER_ID']} {payment_id}")
                 bot.send_message(call.message.chat.id,
-                                f"{MESSAGES['PAYMENT_CHANGED_TO_CONFIRMED_ADMIN']}\n{MESSAGES['ORDER_ID']} {payment_id}")
-                
+                                 f"{MESSAGES['PAYMENT_CHANGED_TO_CONFIRMED_ADMIN']}\n{MESSAGES['ORDER_ID']} {payment_id}")
+
     elif key == "cancel_change_status_payment_by_admin":
         payments = USERS_DB.find_payment(id=int(value))
         if not payments:
@@ -2706,10 +2746,10 @@ def callback_query(call: CallbackQuery):
             bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'])
             return
         user_data = user_data[0]
-        msg = templates.bot_payment_info_template(payment,user_data)
+        msg = templates.bot_payment_info_template(payment, user_data)
         bot.edit_message_caption(msg, call.message.chat.id, call.message.message_id,
-                                      reply_markup=markups.change_status_payment_by_admin(value))
-        
+                                 reply_markup=markups.change_status_payment_by_admin(value))
+
     # Payment - Send Message Callback
     elif key == "send_message_by_admin":
         if not CLIENT_TOKEN:
@@ -2727,7 +2767,7 @@ def callback_query(call: CallbackQuery):
                          reply_markup=markups.while_edit_user_markup())
         bot.register_next_step_handler(call.message, users_bot_send_message_to_user, value)
 
-            
+
     # Back to User Panel Callback
     elif key == "back_to_user_panel":
         usr = utils.user_info(URL, value)
@@ -2743,8 +2783,8 @@ def callback_query(call: CallbackQuery):
     elif key == "back_to_server_management":
         servers = USERS_DB.select_servers()
         bot.edit_message_text(KEY_MARKUP['SERVERS_MANAGEMENT'], call.message.chat.id, call.message.message_id,
-                                    reply_markup=markups.servers_management_markup(servers))
-    
+                              reply_markup=markups.servers_management_markup(servers))
+
     elif key == "back_to_server_list_of_plans":
         plans_list = []
         plans = USERS_DB.select_plans()
@@ -2753,10 +2793,10 @@ def callback_query(call: CallbackQuery):
                 if plan['status']:
                     if plan['server_id'] == int(value):
                         plans_list.append(plan)
-        plans_markup = markups.plans_list_markup(plans_list,value)
+        plans_markup = markups.plans_list_markup(plans_list, value)
         bot.edit_message_text({MESSAGES['USERS_BOT_PLANS_LIST']}, call.message.chat.id, call.message.message_id,
-                         reply_markup=plans_markup)
-        
+                              reply_markup=plans_markup)
+
     elif key == "back_to_server_selected":
         if search_mode == "Single":
             server = USERS_DB.find_server(id=int(value))
@@ -2765,12 +2805,12 @@ def callback_query(call: CallbackQuery):
                 return
             server = server[0]
             plans = USERS_DB.select_plans()
-            msg = templates.server_info_template(server,plans)
+            msg = templates.server_info_template(server, plans)
             bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
-                                        reply_markup=markups.server_selected_markup(value))
+                                  reply_markup=markups.server_selected_markup(value))
         else:
-            bot.edit_message_text(MESSAGES['SEARCH_USER'],call.message.chat.id, call.message.message_id, 
-                              reply_markup=markups.search_user_markup(server_id=value))
+            bot.edit_message_text(MESSAGES['SEARCH_USER'], call.message.chat.id, call.message.message_id,
+                                  reply_markup=markups.search_user_markup(server_id=value))
             search_mode = "Single"
 
     elif key == "back_to_server_user_list":
@@ -2781,19 +2821,19 @@ def callback_query(call: CallbackQuery):
         msg = templates.users_list_template(users_list)
         bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                               reply_markup=markups.users_list_markup(value, users_list))
-        
+
     elif key == "back_to_users_bot_users_management":
         bot.edit_message_text(KEY_MARKUP['BOT_USERS_MANAGEMENT'], call.message.chat.id, call.message.message_id,
                               reply_markup=markups.users_bot_users_management_markup())
     elif key == "back_to_bot_users_or_reffral_management":
         if list_mode == "Bot_Users_Search_Name" or "Bot_User":
             bot.edit_message_text(KEY_MARKUP['BOT_USERS_MANAGEMENT'], call.message.chat.id, call.message.message_id,
-                              reply_markup=markups.users_bot_users_management_markup())
+                                  reply_markup=markups.users_bot_users_management_markup())
         elif list_mode == "User_Refferals":
             users = USERS_DB.find_user(telegram_id=int(selected_telegram_id))
             if not users:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
+                                 reply_markup=markups.main_menu_keyboard_markup())
                 return
             user = users[0]
             orders = USERS_DB.find_order(telegram_id=user['telegram_id'])
@@ -2805,9 +2845,10 @@ def callback_query(call: CallbackQuery):
             non_order_subs = utils.non_order_user_info(user['telegram_id'])
             order_subs = utils.order_user_info(user['telegram_id'])
             plans_list = USERS_DB.select_plans()
-            msg = templates.bot_users_info_template(user, orders, paymets, wallet, non_order_subs, order_subs, plans_list)
+            msg = templates.bot_users_info_template(user, orders, paymets, wallet, non_order_subs, order_subs,
+                                                    plans_list)
             bot.send_message(call.message.chat.id, msg, reply_markup=markups.bot_user_info_markup(value))
-    
+
     elif key == "back_management_item_list":
         approved_payments = list_mode == "Approved_Payments"
         non_approved_payments = list_mode == "Non_Approved_Payments"
@@ -2816,15 +2857,15 @@ def callback_query(call: CallbackQuery):
         digital_payments = list_mode == "Digital_Payments"
         if list_mode == "Orders":
             bot.edit_message_text(KEY_MARKUP['ORDERS_MANAGEMENT'], call.message.chat.id, call.message.message_id,
-                              reply_markup=markups.users_bot_orders_management_markup())
-        elif approved_payments  or non_approved_payments or pending_payments or card_payments or digital_payments:
+                                  reply_markup=markups.users_bot_orders_management_markup())
+        elif approved_payments or non_approved_payments or pending_payments or card_payments or digital_payments:
             bot.edit_message_text(KEY_MARKUP['PAYMENT_MANAGEMENT'], call.message.chat.id, call.message.message_id,
-                              reply_markup=markups.users_bot_payments_management_markup())
+                                  reply_markup=markups.users_bot_payments_management_markup())
         elif list_mode == "User_Payments" or list_mode == "User_Gifts" or list_mode == "User_Orders":
             users = USERS_DB.find_user(telegram_id=int(selected_telegram_id))
             if not users:
                 bot.send_message(call.message.chat.id, MESSAGES['ERROR_UNKNOWN'],
-                                reply_markup=markups.main_menu_keyboard_markup())
+                                 reply_markup=markups.main_menu_keyboard_markup())
                 return
             user = users[0]
             orders = USERS_DB.find_order(telegram_id=user['telegram_id'])
@@ -2836,10 +2877,11 @@ def callback_query(call: CallbackQuery):
             non_order_subs = utils.non_order_user_info(user['telegram_id'])
             order_subs = utils.order_user_info(user['telegram_id'])
             plans_list = USERS_DB.select_plans()
-            msg = templates.bot_users_info_template(user, orders, paymets, wallet, non_order_subs, order_subs, plans_list)
+            msg = templates.bot_users_info_template(user, orders, paymets, wallet, non_order_subs, order_subs,
+                                                    plans_list)
             bot.edit_message_text(msg, call.message.chat.id, call.message.message_id,
                                   reply_markup=markups.bot_user_info_markup(selected_telegram_id))
-    
+
     elif key == "server_status":
         from Utils.serverInfo import get_server_status
         msg_wait = bot.send_message(call.message.chat.id, MESSAGES['WAIT'])
@@ -2854,11 +2896,9 @@ def callback_query(call: CallbackQuery):
             return
         bot.delete_message(call.message.chat.id, msg_wait.message_id)
         bot.send_message(call.message.chat.id, server_status_data, reply_markup=markups.main_menu_keyboard_markup())
-    
+
     elif key == "del_msg":
         bot.delete_message(call.message.chat.id, call.message.message_id)
-
-
 
 
 # Check Admin Permission
@@ -2903,12 +2943,12 @@ def server_backup(message: Message):
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'])
         logging.error("Backup failed")
         return
-    
+
     if message.chat.id in ADMINS_ID:
-        bot.send_document(message.chat.id, open(zip_file_name, 'rb'), caption="🤖Backup",disable_notification=True)
+        bot.send_document(message.chat.id, open(zip_file_name, 'rb'), caption="🤖Backup", disable_notification=True)
     else:
         bot.send_message(message.chat.id, MESSAGES['ERROR_UNKNOWN'])
-        
+
     bot.delete_message(message.chat.id, msg_wait.message_id)
 
 
@@ -2926,7 +2966,7 @@ def search_user(message: Message):
     global server_mode
     server_mode = "All"
     bot.send_message(message.chat.id, MESSAGES['SEARCH_USER'],
-    reply_markup=markups.search_user_markup())
+                     reply_markup=markups.search_user_markup())
 
 
 # Users Bot Management Message Handler
@@ -2937,7 +2977,8 @@ def users_bot_management(message: Message):
         return
     bot.send_message(message.chat.id, KEY_MARKUP['USERS_BOT_MANAGEMENT'],
                      reply_markup=markups.users_bot_management_markup())
-    
+
+
 # Server Management Message Handler
 @bot.message_handler(func=lambda message: message.text == KEY_MARKUP['SERVERS_MANAGEMENT'])
 def servers_management(message: Message):
@@ -2945,10 +2986,12 @@ def servers_management(message: Message):
     bot.send_message(message.chat.id, KEY_MARKUP['SERVERS_MANAGEMENT'],
                      reply_markup=markups.servers_management_markup(servers))
 
+
 # About Message Handler
 @bot.message_handler(func=lambda message: message.text == KEY_MARKUP['ABOUT_BOT'])
 def about_bot(message: Message):
     bot.send_message(message.chat.id, templates.about_template())
+
 
 # Debug Handler
 @bot.message_handler(commands=['debug'])
