@@ -105,7 +105,7 @@ def send_to_users(message: Message):
             #                caption=msg, reply_markup=markups.mmark())
             photo_path = os.path.join(os.getcwd(), 'test.png')
 
-            s = bot.send_photo(x[1], photo=open(photo_path, 'rb'),
+            s = bot.send_photo(x[1], photo="AgACAgQAAxkDAAINJWZfN5uu6mKsbWjnQcJ2I9ySngIiAALHwjEbnxX5UokGKK5B-CsXAQADAgADcwADNQQ",
                                caption=msg)
 
             # s = user_bot.send_photo(x[1],
