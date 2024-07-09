@@ -94,7 +94,7 @@ def send_to_users(message: Message):
         try:
             txt = ""
             # usage = int(x[2])
-            msg = MESSAGES['SEND_HAMESTER2']
+            msg = MESSAGES['SEND_BTC_ADD']
             # if usage < 0:
             #     msg += "\n" + "کانکشن مخصوص شما با توجه به دعوت از دیگران که قبلا انجام دادید " + str(
             #         round(abs(usage) / 1024) + 2) + " گیگ و " + str(
@@ -104,16 +104,16 @@ def send_to_users(message: Message):
             # s = user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
             #                         caption=msg)
 
-            s = user_bot.send_photo(x[1], photo="AgACAgQAAxkDAAEEuNZmX2Y7ijhlarctvchQAm01DrpQewAC1MExG-Ay-FJq2P0wbfhEzwEAAwIAA3MAAzUE",
-                               caption=msg)
+            # s = user_bot.send_photo(x[1], photo="AgACAgQAAxkDAAEEuNZmX2Y7ijhlarctvchQAm01DrpQewAC1MExG-Ay-FJq2P0wbfhEzwEAAwIAA3MAAzUE",
+            #                    caption=msg)
 
             # s = user_bot.send_photo(x[1],
             #                         "AgACAgQAAxkDAAEEOThlaLMLqv6Nc7myS0i4vTq5fAcHmgACK78xGwh2SVMpi6kfPJNL5AEAAwIAA3MAAzME",
             #                         caption=msg
             #                         # , reply_markup=markups.mmark()
             #                         )
-            logging.debug(s)
-            # user_bot.send_message(x[1], txt)
+            # logging.debug(s)
+            user_bot.send_message(x[1], msg)
             conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
             conectionuser.commit()
             time.sleep(0.03)
