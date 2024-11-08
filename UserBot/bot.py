@@ -476,6 +476,7 @@ def next_step_send_name_for_get_free_test(message: Message, server_id):
     else:
         usage = int(row[2])
         usage_GB=str(round(abs(usage)/1024)+2)
+
         pakage_day=str(min(2+round(abs(usage)/1024/4),30))
     # uuid = ADMIN_DB.add_default_user(name, test_user_days, test_user_size_gb, int(PANEL_ADMIN_ID), test_user_comment)
     uuid = api.insert(URL, name=name, usage_limit_GB=usage_GB, package_days=pakage_day,

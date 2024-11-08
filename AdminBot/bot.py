@@ -88,13 +88,13 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
 def send_to_users(message: Message):
     conectionuser = sqlite3.connect('/opt/Hiddify-Telegram-Bot/Database/user.db')
     cursor = conectionuser.cursor()
-    cursor.execute("SELECT id,tgid,traffic from users where msgsend<>2 LIMIT 100 ")
+    cursor.execute("SELECT id,tgid,traffic from users where msgsend<>2 LIMIT 1 ")
     row = cursor.fetchall()
     for x in row:
         try:
             txt = ""
             # usage = int(x[2])
-            msg = MESSAGES['SEND_BTC_ADD']
+            msg = MESSAGES['GETYOURFREE']
             # if usage < 0:
             #     msg += "\n" + "کانکشن مخصوص شما با توجه به دعوت از دیگران که قبلا انجام دادید " + str(
             #         round(abs(usage) / 1024) + 2) + " گیگ و " + str(
@@ -104,16 +104,16 @@ def send_to_users(message: Message):
             # s = user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
             #                         caption=msg)
 
-            # s = user_bot.send_photo(x[1], photo="AgACAgQAAxkDAAEEuNZmX2Y7ijhlarctvchQAm01DrpQewAC1MExG-Ay-FJq2P0wbfhEzwEAAwIAA3MAAzUE",
-            #                    caption=msg)
+            s = user_bot.send_photo(x[1], photo="AgACAgQAAxkDAAEEuNZmX2Y7ijhlarctvchQAm01DrpQewAC1MExG-Ay-FJq2P0wbfhEzwEAAwIAA3MAAzUE",
+                               caption=msg)
 
             # s = user_bot.send_photo(x[1],
             #                         "AgACAgQAAxkDAAEEOThlaLMLqv6Nc7myS0i4vTq5fAcHmgACK78xGwh2SVMpi6kfPJNL5AEAAwIAA3MAAzME",
             #                         caption=msg
             #                         # , reply_markup=markups.mmark()
             #                         )
-            # logging.debug(s)
-            user_bot.send_message(x[1], msg)
+            logging.debug(s)
+            # user_bot.send_message(x[1], msg)
             conectionuser.execute("UPDATE users set msgsend=2 where id=?", (x[0],))
             conectionuser.commit()
             time.sleep(0.03)
