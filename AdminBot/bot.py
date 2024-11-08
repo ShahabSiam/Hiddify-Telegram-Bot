@@ -66,9 +66,7 @@ def is_it_cancel(message: Message, response=MESSAGES['CANCELED']):
         #         msg = MESSAGES['GETYOURFREE']
         #         if usage<0:
         #             msg+="\n"+"کانکشن مخصوص شما با توجه به دعوت از دیگران که قبلا انجام دادید " + str(round(abs(usage)/1024)+2)+ " گیگ و "+ str(min(2+round(abs(usage)/1024/4),30))+" روز می باشد"+"\n"
-        #         photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', 'test.jpg')
-        #         # s=user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
-        #         #                caption=msg, reply_markup=markups.mmark())
+
         #         s = user_bot.send_photo(x[1], "AgACAgQAAxkDAAEEOThlaLMLqv6Nc7myS0i4vTq5fAcHmgACK78xGwh2SVMpi6kfPJNL5AEAAwIAA3MAAzME",
         #                                 caption=msg, reply_markup=markups.mmark())
         #         logging.info(s)
@@ -103,9 +101,11 @@ def send_to_users(message: Message):
             # photo_path = os.path.join(os.getcwd(), 'ham.jpg')
             # s = user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
             #                         caption=msg)
-
-            s = user_bot.send_photo(x[1], photo="AgACAgQAAxkDAAEEuNZmX2Y7ijhlarctvchQAm01DrpQewAC1MExG-Ay-FJq2P0wbfhEzwEAAwIAA3MAAzUE",
-                               caption=msg)
+            photo_path = os.path.join(os.getcwd(), 'UserBot', 'Receiptions', 'test.jpg')
+            s = user_bot.send_photo(x[1], photo=open(photo_path, 'rb'),
+                                    caption=msg, reply_markup=markups.mmark())
+            # s = user_bot.send_photo(x[1], photo="AgACAgQAAxkDAAEEuNZmX2Y7ijhlarctvchQAm01DrpQewAC1MExG-Ay-FJq2P0wbfhEzwEAAwIAA3MAAzUE",
+            #                    caption=msg)
 
             # s = user_bot.send_photo(x[1],
             #                         "AgACAgQAAxkDAAEEOThlaLMLqv6Nc7myS0i4vTq5fAcHmgACK78xGwh2SVMpi6kfPJNL5AEAAwIAA3MAAzME",
